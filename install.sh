@@ -19,7 +19,7 @@ if [ "$1" = "--install" ]; then
     clear
     echo -e "${BLUE}Starting direct installation...${NC}"
     # Download and execute setup
-    wget -O setup.sh https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/setup.sh
+    wget -O setup.sh https://raw.githubusercontent.com/Abdofaiz/cdn/main/setup.sh
     chmod +x setup.sh
     ./setup.sh
     rm setup.sh
