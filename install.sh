@@ -30,7 +30,7 @@ apt install -y wget curl git unzip jq build-essential net-tools
 mkdir -p /etc/xray
 mkdir -p /var/log/xray
 mkdir -p /usr/local/bin
-mkdir -p /etc/autoscript
+mkdir -p /etc/cdn
 
 # Install essential packages
 echo -e "Installing essential packages..."
@@ -54,28 +54,28 @@ apt install -y \
 echo -e "Installing core services..."
 
 # SSH Setup
-bash <(curl -Ls https://raw.githubusercontent.com/yourusername/autoscript/main/ssh/ssh-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/ssh/ssh-setup.sh)
 
 # Dropbear Setup
-bash <(curl -Ls https://raw.githubusercontent.com/yourusername/autoscript/main/dropbear/dropbear-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/dropbear/dropbear-setup.sh)
 
 # XRAY Setup
-bash <(curl -Ls https://raw.githubusercontent.com/yourusername/autoscript/main/xray/xray-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/xray/xray-setup.sh)
 
 # OpenVPN Setup
-bash <(curl -Ls https://raw.githubusercontent.com/yourusername/autoscript/main/openvpn/openvpn-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/openvpn/openvpn-setup.sh)
 
 # L2TP Setup
-bash <(curl -Ls https://raw.githubusercontent.com/yourusername/autoscript/main/l2tp/l2tp-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/l2tp/l2tp-setup.sh)
 
 # WebSocket Setup
-bash <(curl -Ls https://raw.githubusercontent.com/yourusername/autoscript/main/websocket/ws-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/websocket/ws-setup.sh)
 
 # SlowDNS Setup
-bash <(curl -Ls https://raw.githubusercontent.com/yourusername/autoscript/main/slowdns/slowdns-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/slowdns/slowdns-setup.sh)
 
 # UDPGW Setup
-bash <(curl -Ls https://raw.githubusercontent.com/yourusername/autoscript/main/udpgw/udpgw-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/udpgw/udpgw-setup.sh)
 
 # Create menu scripts
 echo -e "Creating menu scripts..."
@@ -117,7 +117,7 @@ chmod +x /usr/local/bin/menu
 
 # Create additional menu scripts
 for menu in ssh xray l2tp ws slowdns system status settings; do
-    wget -O /usr/local/bin/${menu}-menu https://raw.githubusercontent.com/yourusername/autoscript/main/menu/${menu}-menu.sh
+    wget -O /usr/local/bin/${menu}-menu https://raw.githubusercontent.com/Abdofaiz/cdn/main/menu/${menu}-menu.sh
     chmod +x /usr/local/bin/${menu}-menu
 done
 
