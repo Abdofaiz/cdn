@@ -14,6 +14,18 @@ if [ "${EUID}" -ne 0 ]; then
     exit 1
 fi
 
+# Direct installation command
+if [ "$1" = "--install" ]; then
+    clear
+    echo -e "${BLUE}Starting direct installation...${NC}"
+    # Download and execute setup
+    wget -O setup.sh https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/setup.sh
+    chmod +x setup.sh
+    ./setup.sh
+    rm setup.sh
+    exit 0
+fi
+
 clear
 echo -e "${BLUE}=============================${NC}"
 echo -e "${YELLOW}    VPS INSTALLATION SCRIPT    ${NC}"
@@ -50,70 +62,76 @@ apt install -y \
     openssh-server \
     stunnel4
 
-# Setup menu system
-echo -e "Setting up menu system..."
-cd /usr/local/bin
-wget -q -O menu-master.zip https://github.com/Abdofaiz/faiz-vpn/archive/refs/heads/main.zip
-unzip -qq menu-master.zip
-cp -rf faiz-vpn-main/menu/* /usr/local/bin/
-rm -rf faiz-vpn-main menu-master.zip
-
-# Set permissions
-chmod +x /usr/local/bin/*
-chown root:root /usr/local/bin/*
-
-# Create symbolic links
-for script in /usr/local/bin/*; do
-    name=$(basename $script)
-    ln -sf $script /usr/bin/$name 2>/dev/null
-done
-
-# Add to PATH
-echo 'export PATH="/usr/local/bin:$PATH"' > /etc/profile.d/custom-path.sh
-source /etc/profile.d/custom-path.sh
-
-# Create auto-update script
-cat > /usr/local/bin/update-scripts <<EOF
-#!/bin/bash
-cd /usr/local/bin
-wget -q -O menu-master.zip https://github.com/Abdofaiz/faiz-vpn/archive/refs/heads/main.zip
-unzip -qq menu-master.zip
-cp -rf faiz-vpn-main/menu/* /usr/local/bin/
-rm -rf faiz-vpn-main menu-master.zip
-chmod +x /usr/local/bin/*
-echo -e "${GREEN}Scripts updated successfully!${NC}"
-EOF
-chmod +x /usr/local/bin/update-scripts
-
-# Add auto-update to cron
-echo "0 0 * * * root /usr/local/bin/update-scripts >/dev/null 2>&1" > /etc/cron.d/autoupdate-scripts
-
 # Download and install core services
 echo -e "Installing core services..."
 
 # SSH Setup
-bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/menu/ssh/ssh-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/ssh/ssh-setup.sh)
 
 # Dropbear Setup
-bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/menu/dropbear/dropbear-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/dropbear/dropbear-setup.sh)
 
 # XRAY Setup
-bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/menu/xray/xray-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/xray/xray-setup.sh)
 
 # OpenVPN Setup
-bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/menu/openvpn/openvpn-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/openvpn/openvpn-setup.sh)
 
 # L2TP Setup
-bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/menu/l2tp/l2tp-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/l2tp/l2tp-setup.sh)
 
 # WebSocket Setup
-bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/menu/websocket/ws-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/websocket/ws-setup.sh)
 
 # SlowDNS Setup
-bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/menu/slowdns/slowdns-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/slowdns/slowdns-setup.sh)
 
 # UDPGW Setup
-bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/faiz-vpn/main/menu/udpgw/udpgw-setup.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Abdofaiz/cdn/main/udpgw/udpgw-setup.sh)
+
+# Create menu scripts
+echo -e "Creating menu scripts..."
+
+# Main Menu
+cat > /usr/local/bin/menu <<EOF
+#!/bin/bash
+clear
+echo -e "${BLUE}=============================${NC}"
+echo -e "${YELLOW}         MAIN MENU          ${NC}"
+echo -e "${BLUE}=============================${NC}"
+echo -e "1) SSH & OpenVPN Menu"
+echo -e "2) XRAY Menu"
+echo -e "3) L2TP Menu"
+echo -e "4) WebSocket Menu"
+echo -e "5) SlowDNS Menu"
+echo -e "6) System Menu"
+echo -e "7) Status Menu"
+echo -e "8) Settings Menu"
+echo -e "0) Exit"
+echo -e ""
+read -p "Select option: " choice
+
+case \$choice in
+    1) ssh-menu ;;
+    2) xray-menu ;;
+    3) l2tp-menu ;;
+    4) ws-menu ;;
+    5) slowdns-menu ;;
+    6) system-menu ;;
+    7) status-menu ;;
+    8) settings-menu ;;
+    0) exit 0 ;;
+    *) echo -e "${RED}Invalid option${NC}" ;;
+esac
+EOF
+
+chmod +x /usr/local/bin/menu
+
+# Create additional menu scripts
+for menu in ssh xray l2tp ws slowdns system status settings; do
+    wget -O /usr/local/bin/${menu}-menu https://raw.githubusercontent.com/Abdofaiz/cdn/main/menu/${menu}-menu.sh
+    chmod +x /usr/local/bin/${menu}-menu
+done
 
 # Setup auto-start service
 cat > /etc/systemd/system/vps-startup.service <<EOF
@@ -160,7 +178,6 @@ echo "0 0 * * * root /usr/local/bin/delete-expired" >> /etc/crontab
 # Final setup
 echo -e "${GREEN}Installation completed!${NC}"
 echo -e "Use 'menu' command to access VPS management menu"
-echo -e "Use 'update-scripts' to manually update all scripts"
 echo -e "Default ports:"
 echo -e "SSH: 22, 443"
 echo -e "Dropbear: 143, 109"
