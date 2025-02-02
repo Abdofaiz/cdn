@@ -1,0 +1,45 @@
+#!/bin/bash
+# Main Menu Script
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Get ports
+openvpn_port="$(netstat -nlpt | grep -i openvpn | grep -i 0.0.0.0 | awk '{print $4}' | cut -d: -f2)"
+ssh_port="$(netstat -nlpt | grep -i ssh | grep -i 0.0.0.0 | awk '{print $4}' | cut -d: -f2)"
+
+show_menu() {
+    clear
+    echo -e "${BLUE}=============================${NC}"
+    echo -e "${YELLOW}     MAIN MENU     ${NC}"
+    echo -e "${BLUE}=============================${NC}"
+    echo -e ""
+    echo -e "${GREEN}1${NC}. SSH & OpenVPN Menu" 
+    echo -e "${GREEN}2${NC}. XRAY Menu"
+    echo -e "${GREEN}3${NC}. Trojan Menu"
+    echo -e "${GREEN}4${NC}. System Menu"
+    echo -e "${GREEN}5${NC}. Status Menu" 
+    echo -e "${GREEN}6${NC}. Tools Menu"
+    echo -e "${GREEN}0${NC}. Exit"
+    echo -e ""
+    echo -e "${BLUE}=============================${NC}"
+}
+
+while true; do
+    show_menu
+    read -p "Select option: " choice
+    case $choice in
+        1) ssh-menu ;;
+        2) xray-menu ;;
+        3) trojan-menu ;;
+        4) system-menu ;;
+        5) status-menu ;;
+        6) tools-menu ;;
+        0) break ;;
+        *) echo -e "${RED}Invalid option${NC}" ;;
+    esac
+done 
